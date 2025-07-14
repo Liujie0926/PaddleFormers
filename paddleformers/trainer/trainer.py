@@ -706,6 +706,8 @@ class Trainer:
                 if k not in old_state_dict or id(v) != id(old_state_dict[k]):
                     new_state_dict[k] = v
             self.model.set_state_dict(new_state_dict)
+            if self.args.offload_optim:
+                self._offload_optimizer()
         else:
             if resume_from_checkpoint is not None and (self.args.dataset_rank == 0 or self.args.use_expert_parallel):
 
