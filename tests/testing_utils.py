@@ -552,22 +552,22 @@ def set_proxy(download_hub: DownloadSource = None):
             if download_hub is None:
                 return func(*args, **kwargs)
             elif download_hub == DownloadSource.HUGGINGFACE:
-                if "HF_PROXY_PATH" not in os.environ:
-                    print(
-                        "`HF_PROXY_PATH` environment variable does not defined before using `set_proxy`, please define it first"
-                    )
+                # if "HF_PROXY_PATH" not in os.environ:
+                #     print(
+                #         "`HF_PROXY_PATH` environment variable does not defined before using `set_proxy`, please define it first"
+                #     )
                 proxy_path = os.path.abspath(os.environ["HF_PROXY_PATH"])
             elif download_hub == DownloadSource.AISTUDIO:
-                if "AISTUDIO_PROXY_PATH" not in os.environ:
-                    print(
-                        "`AISTUDIO_PROXY_PATH` environment variable does not defined before using `set_proxy`, please define it first"
-                    )
+                # if "AISTUDIO_PROXY_PATH" not in os.environ:
+                #     print(
+                #         "`AISTUDIO_PROXY_PATH` environment variable does not defined before using `set_proxy`, please define it first"
+                #     )
                 proxy_path = os.path.abspath(os.environ["AISTUDIO_PROXY_PATH"])
             elif download_hub == DownloadSource.MODELSCOPE:
-                if "AISTUDIO_PROXY_PATH" not in os.environ:
-                    print(
-                        "`AISTUDIO_PROXY_PATH` environment variable does not defined before using `set_proxy`, please define it first"
-                    )
+                # if "AISTUDIO_PROXY_PATH" not in os.environ:
+                #     print(
+                #         "`AISTUDIO_PROXY_PATH` environment variable does not defined before using `set_proxy`, please define it first"
+                #     )
                 proxy_path = os.path.abspath(
                     os.environ["AISTUDIO_PROXY_PATH"]
                 )  # proxy_aistudio also suit for modelscope
