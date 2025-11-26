@@ -355,10 +355,10 @@ def _apply_rotary_emb(
     cos: paddle.Tensor,
     sin: paddle.Tensor,
 ) -> paddle.Tensor:
-    first_half, second_half = paddle.chunk(x.transpose([0, 2, 1, 3]), 2, axis=-1)
+    first_half, second_half = paddle.chunk(x, 2, axis=-1)
     first_ = first_half * cos - second_half * sin
     second_ = second_half * cos + first_half * sin
-    return paddle.cat((first_, second_), axis=-1).transpose([0, 2, 1, 3])
+    return paddle.cat((first_, second_), axis=-1)
 
 
 def apply_rotary_pos_emb(q, k, cos, sin, position_ids=None, unsqueeze_dim=1):
@@ -494,9 +494,11 @@ class GptOssAttention(nn.Layer):
         else:
             target_query_shape = [0, 0, self.num_heads, self.head_dim]
             target_key_value_shape = [0, 0, self.num_key_value_heads, self.head_dim]
-        query_states = query_states.reshape(target_query_shape)
-        key_states = key_states.reshape(target_key_value_shape)
-        value_states = value_states.reshape(target_key_value_shape)
+        # b l h d -> b h l d
+        query_states = query_states.reshape(target_query_shape).transpose(1, 2)
+        key_states = key_states.reshape(target_key_value_shape).transpose(1, 2)
+        value_states = value_states.reshape(target_key_value_shape).transpose(1, 2)
+
         attention_interface = ALL_ATTENTION_FUNCTIONS[self.config._attn_implementation]
         cos, sin = position_embeddings
         query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin, position_ids)
