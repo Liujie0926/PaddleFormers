@@ -354,7 +354,7 @@ def run_sft(
         "stage": model_args.stage,
         "template_backend": data_args.template_backend,
         "split_multi_turn": data_args.split_multi_turn,
-        "pre_shift_one": data_args.pre_shift_one,
+        "mask_history_eos": data_args.mask_history_eos,
     }
 
     dataset_config.update(
