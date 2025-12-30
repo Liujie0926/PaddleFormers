@@ -74,7 +74,7 @@ NNODES=1 MASTER_ADDR=$master MASTER_PORT=$port coverage run $(which paddleformer
 exit_code=$?
 if [ $exit_code -ne 0 ]; then
       echo "Qwen3-30B-A3B single card training failed, try to check the log ./qwen3_single_card.log"
-      python $root_dir/PaddleFormers/tests/check_log_for_exitcode.py ./qwen3_single_card.log
+      python $root_dir/PaddleFormers/tests/check_log_for_exitcode.py ./qwen3_single_card.log "***** train metrics *****"
       check_exit_code=$?
       if [ $check_exit_code -ne 0 ]; then
          echo "Log check failed."
