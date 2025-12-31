@@ -554,7 +554,6 @@ class DeepseekV3Attention(nn.Layer):
                 self.num_heads * self.q_head_dim,
                 has_bias=False,
                 config=config,
-                fuse_matmul_bias=config.fuse_linear,
                 tp_plan="colwise",
                 gather_output=False,
             )
@@ -564,7 +563,6 @@ class DeepseekV3Attention(nn.Layer):
                 config.q_lora_rank,
                 has_bias=config.attention_bias,
                 config=config,
-                fuse_matmul_bias=config.fuse_linear,
                 linear_type="default",
                 gather_output=False,
             )
@@ -573,7 +571,6 @@ class DeepseekV3Attention(nn.Layer):
                 self.num_heads * self.q_head_dim,
                 has_bias=False,
                 config=config,
-                fuse_matmul_bias=config.fuse_linear,
                 tp_plan="colwise",
                 gather_output=False,
             )
@@ -589,7 +586,6 @@ class DeepseekV3Attention(nn.Layer):
             config.kv_lora_rank + config.qk_rope_head_dim,
             has_bias=config.attention_bias,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             linear_type="default",
             gather_output=False,
         )
@@ -599,7 +595,6 @@ class DeepseekV3Attention(nn.Layer):
             self.num_heads * (self.q_head_dim - self.qk_rope_head_dim + self.v_head_dim),
             has_bias=False,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             tp_plan="colwise",
             gather_output=False,
         )
@@ -609,7 +604,6 @@ class DeepseekV3Attention(nn.Layer):
             self.hidden_size,
             has_bias=config.attention_bias,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             tp_plan="rowwise",
             gather_output=False,
             input_is_parallel=True,

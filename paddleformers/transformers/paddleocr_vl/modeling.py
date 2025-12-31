@@ -134,28 +134,24 @@ class PaddleOCRAttention(nn.Layer):
             self.embed_dim,
             self.embed_dim,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             tp_plan="colwise",
         )
         self.k_proj = GeneralLinear.create(
             self.embed_dim,
             self.embed_dim,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             tp_plan="colwise",
         )
         self.v_proj = GeneralLinear.create(
             self.embed_dim,
             self.embed_dim,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             tp_plan="colwise",
         )
         self.out_proj = GeneralLinear.create(
             self.embed_dim,
             self.embed_dim,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             tp_plan="rowwise",
         )
 
@@ -347,14 +343,12 @@ class PaddleOCRMLP(nn.Layer):
             config.hidden_size,
             config.intermediate_size,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             tp_plan="colwise",
         )
         self.fc2 = GeneralLinear.create(
             config.intermediate_size,
             config.hidden_size,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             tp_plan="rowwise",
         )
 
@@ -897,7 +891,6 @@ class Projector(nn.Layer):
             self.hidden_size,
             has_bias=True,
             config=text_config,
-            fuse_matmul_bias=text_config.fuse_linear,
         )
         self.act = ACT2FN["gelu"]
         self.linear_2 = GeneralLinear.create(
@@ -905,7 +898,6 @@ class Projector(nn.Layer):
             self.text_config.hidden_size,
             has_bias=True,
             config=text_config,
-            fuse_matmul_bias=text_config.fuse_linear,
         )
 
     def forward(self, image_features, image_grid_thw):
@@ -1039,7 +1031,6 @@ class Ernie4_5Attention(nn.Layer):
             q_hidden_size,
             has_bias=config.use_bias,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             tp_plan="colwise",
         )
         self.k_proj = GeneralLinear.create(
@@ -1047,7 +1038,6 @@ class Ernie4_5Attention(nn.Layer):
             kv_hidden_size,
             has_bias=config.use_bias,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             tp_plan="colwise",
         )
         self.v_proj = GeneralLinear.create(
@@ -1055,7 +1045,6 @@ class Ernie4_5Attention(nn.Layer):
             kv_hidden_size,
             has_bias=config.use_bias,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             tp_plan="colwise",
         )
 
@@ -1064,7 +1053,6 @@ class Ernie4_5Attention(nn.Layer):
             self.hidden_size,
             has_bias=config.use_bias,
             config=config,
-            fuse_matmul_bias=config.fuse_linear,
             tp_plan="rowwise",
         )
 
