@@ -392,6 +392,8 @@ def run_sft(
 
     processor = AutoProcessor.from_pretrained(model_args.model_name_or_path, use_fast=data_args.processor_use_fast)
 
+    type_map = {"bf16": "bfloat16", "fp16": "float16"}
+    compute_type = type_map.get(training_args.compute_type, "float32")
     dataset_config = {
         "tokenizer": tokenizer,
         "processor": processor,
@@ -411,6 +413,7 @@ def run_sft(
         "stage": model_args.stage,
         "template_backend": data_args.template_backend,
         "split_multi_turn": data_args.split_multi_turn,
+        "dtype": compute_type,
         "dataset_num_proc": finetuning_args.dataset_num_proc,
         "binpacking": data_args.binpacking,
         "packing_interval": data_args.packing_interval,
