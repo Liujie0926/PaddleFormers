@@ -325,10 +325,12 @@ def run_dpo(
         "encode_one_turn": data_args.encode_one_turn,
         "stage": model_args.stage,
         "template_backend": data_args.template_backend,
+        "dataset_type": data_args.dataset_type,
         "use_filtered_label_loss": model_config.use_filtered_label_loss,
         "dtype": compute_type,
         "binpacking": data_args.binpacking,
         "packing_interval": data_args.packing_interval,
+        "truncation_strategy": data_args.truncation_strategy,
     }
 
     dataset_config.update(

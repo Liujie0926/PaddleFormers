@@ -413,6 +413,8 @@ def run_sft(
         "stage": model_args.stage,
         "template_backend": data_args.template_backend,
         "split_multi_turn": data_args.split_multi_turn,
+        "dataset_type": data_args.dataset_type,
+        "truncation_strategy": data_args.truncation_strategy,
         "dtype": compute_type,
         "dataset_num_proc": finetuning_args.dataset_num_proc,
         "binpacking": data_args.binpacking,
@@ -624,7 +626,7 @@ def run_sft(
                 "Random mixing requires a fixed number of training steps to properly sample data."
             )
         if training_args.should_load_dataset and paddle.distributed.get_rank() == 0:
-            if data_args.dataset_type != "pretrain" and data_args.dataset_type != "offline":
+            if data_args.dataset_type not in {"pretrain", "offline", "map"}:
                 training_args.max_steps = estimate_training(train_dataset, data_args, training_args, model_args)
                 del train_dataset
                 gc.collect()
