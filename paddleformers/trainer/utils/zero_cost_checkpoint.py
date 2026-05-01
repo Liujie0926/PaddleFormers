@@ -20,6 +20,7 @@ import json
 import multiprocessing
 import os
 import random
+import re
 import time
 from abc import ABC, abstractmethod
 from collections import OrderedDict, defaultdict
@@ -1953,8 +1954,16 @@ class ZeroCostCheckpointCallbackFcBased(ZeroCostCheckpointCallback):
             replicate_saved_into_local=self.args.replicate_saved_into_local,
         )
 
+        grouped_gemm_params = set()
+        model_sharded_state_dict = model.sharded_state_dict()
+        for k, v in model_sharded_state_dict.items():
+            if getattr(v, "grouped_gemm_param", False):
+                grouped_gemm_params.add(k)
+
+        self.grouped_gemm_params = grouped_gemm_params if _is_muon_sharding_optimizer(optimizer) else set()
+
         # opt state dict ckpt meta and filter
-        opt_state_dict_tmp = optimizer.sharded_state_dict(model.sharded_state_dict())
+        opt_state_dict_tmp = optimizer.sharded_state_dict(model_sharded_state_dict)
 
         opt_state_dict = {}
         master_weights = {}
@@ -2072,6 +2081,7 @@ class ZeroCostCheckpointCallbackFcBased(ZeroCostCheckpointCallback):
 
         dynamic_objecs["unified_name_mapping"] = self.unified_name_mapping
         dynamic_objecs["param_slice_info"] = self.param_slice_info
+        dynamic_objecs["grouped_gemm_params"] = self.grouped_gemm_params
 
         return dynamic_objecs
 
@@ -2112,6 +2122,7 @@ class ZeroCostCheckpointWorkerFcBased(ZeroCostCheckpointWorker):
         self.opt_state_filter = dynamic_objecs["opt_state_filter"]
         self.master_weight_ckpt_meta = dynamic_objecs["master_weight_ckpt_meta"]
         self.master_weights_filter = dynamic_objecs["master_weights_filter"]
+        self.grouped_gemm_params = dynamic_objecs["grouped_gemm_params"]
 
         self.unified_name_mapping = dynamic_objecs["unified_name_mapping"]
         self.param_slice_info = dynamic_objecs["param_slice_info"]
@@ -2217,6 +2228,20 @@ class ZeroCostCheckpointWorkerFcBased(ZeroCostCheckpointWorker):
             logger.info("[ZCC worker] opt state dict filter by opt_state_filter complete.")
             master_weights = self._filter_state_dict(master_weights, self.master_weights_filter)
             logger.info("[ZCC worker] master weights dict filter by master_weights_filter complete.")
+
+            def _extract_struct_name(key):
+                match = re.match(r"^(.*)\.(moment1_0|moment2_0)$", key)
+                return match.group(1) if match else None
+
+            if self.grouped_gemm_params and len(self.grouped_gemm_params) > 0:
+                for k, v in opt_state_dict.items():
+                    struct_name = _extract_struct_name(k)
+                    if struct_name is not None and struct_name in self.grouped_gemm_params:
+                        origin_shape = v.shape
+                        opt_state_dict[k] = v.reshape((-1, v.shape[-1]))
+                        logger.info(
+                            f"[ZCC worker] {k} with shape {origin_shape} is reshaped to {opt_state_dict[k].shape}."
+                        )
 
             logger.debug(f"opt states length is {len(opt_state_dict)}")
             logger.debug(f"master weights length is {len(master_weights)}")
