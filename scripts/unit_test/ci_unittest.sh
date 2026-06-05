@@ -50,7 +50,9 @@ install_requirements() {
         #fleet
         python -m pip install --pre paddlefleet --extra-index-url https://www.paddlepaddle.org.cn/packages/stable/cu129/  --extra-index-url https://www.paddlepaddle.org.cn/packages/nightly/cu129/ 
         #paddlefleet_ops
-        python -m pip install --pre  paddlefleet-ops --index-url https://www.paddlepaddle.org.cn/packages/nightly/cu129/ --extra-index-url https://www.paddlepaddle.org.cn/packages/stable/cu129/ --no-cache-dir --force-reinstall --no-dependencies
+        wget -q https://paddle-whl.bj.bcebos.com/nightly/cu129/paddlefleet-ops/paddlefleet_ops-0.3.0.dev20260604+02aed7c3-cp312-cp312-linux_x86_64.whl
+        pip install  paddlefleet_ops-0.3.0.dev20260604+02aed7c3-cp312-cp312-linux_x86_64.whl --extra-index-url https://www.paddlepaddle.org.cn/packages/stable/cu129/ --extra-index-url https://www.paddlepaddle.org.cn/packages/nightly/cu129/ -i https://pypi.org/simple 
+        # python -m pip install --pre paddlefleet-ops --index-url https://www.paddlepaddle.org.cn/packages/nightly/cu129/ --extra-index-url https://www.paddlepaddle.org.cn/packages/stable/cu129/
         python -m pip uninstall paddlepaddle-gpu -y
         #paddle
         wget -q $paddle
@@ -59,7 +61,9 @@ install_requirements() {
     else
         pip install "$(ls -t dist/*.whl | head -1)[paddlefleet]" -i https://pypi.org/simple --extra-index-url https://www.paddlepaddle.org.cn/packages/stable/cu129/ --extra-index-url https://www.paddlepaddle.org.cn/packages/nightly/cu129/
         #paddlefleet_ops
-        python -m pip install --pre  paddlefleet-ops --index-url https://www.paddlepaddle.org.cn/packages/nightly/cu129/ --extra-index-url https://www.paddlepaddle.org.cn/packages/stable/cu129/ --no-cache-dir --force-reinstall --no-dependencies
+        wget -q https://paddle-whl.bj.bcebos.com/nightly/cu129/paddlefleet-ops/paddlefleet_ops-0.3.0.dev20260604+02aed7c3-cp312-cp312-linux_x86_64.whl
+        pip install  paddlefleet_ops-0.3.0.dev20260604+02aed7c3-cp312-cp312-linux_x86_64.whl --extra-index-url https://www.paddlepaddle.org.cn/packages/stable/cu129/ --extra-index-url https://www.paddlepaddle.org.cn/packages/nightly/cu129/ -i https://pypi.org/simple 
+        # python -m pip install --pre  paddlefleet-ops --index-url https://www.paddlepaddle.org.cn/packages/nightly/cu129/ --extra-index-url https://www.paddlepaddle.org.cn/packages/stable/cu129/
     fi
     pip install -r tests/requirements.txt -i https://pypi.org/simple 
 
