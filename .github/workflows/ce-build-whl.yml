@@ -1,7 +1,7 @@
 name: Build Whl CE
 
 on:
-  push:
+  pull_request:
     branches:
       - develop
       - release/*
@@ -90,10 +90,24 @@ jobs:
           cp /home/models/bos/bos_tools.py ./
           for FILE in /workspace/PaddleFormers/upload/*; do
             file=$(basename "$FILE")
-            python bos_tools.py $file paddle-whl/nightly/cu126/paddleformers/
-            python bos_tools.py $file paddle-whl/nightly/cu129/paddleformers/
-            python bos_tools.py $file paddle-whl/nightly/cu130/paddleformers/
-            echo "$file: https://paddle-whl.bj.bcebos.com/nightly/cu126/paddleformers/$file"
+            for cuda in cu126 cu129 cu130; do
+              python bos_tools.py $file paddle-whl/nightly/$cuda/paddleformers/
+              echo "$file: https://paddle-whl.bj.bcebos.com/nightly/$cuda/paddleformers/$file"
+              python3 -c "
+              import requests, os, time
+              url = \"http://paddletest.baidu-int.com:8999/api/paddle_link\"
+              params = {
+                  \"build_type\": \"COMMIT\",
+                  \"branch\": os.environ.get(\"BRANCH\", \"\"),
+                  \"commit_id\": os.environ.get(\"COMMIT_ID\", \"\"),
+                  \"artifact_url\": \"https://paddle-whl.bj.bcebos.com/nightly/$cuda/paddleformers/$file\",
+                  \"commit_time\": str(int(time.time())),
+                  \"repo\": \"PaddleFormers\"
+              }
+              response = requests.post(url, params=params)
+              print(response.text)
+              "
+            done
           done
           '
 
